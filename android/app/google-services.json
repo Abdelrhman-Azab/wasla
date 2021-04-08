@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "583530748642",
+    "firebase_url": "https://wasla-7720c-default-rtdb.firebaseio.com",
+    "project_id": "wasla-7720c",
+    "storage_bucket": "wasla-7720c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583530748642:android:4b363f3428ffd0d0c11cbb",
+        "android_client_info": {
+          "package_name": "com.example.wasla"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583530748642-460a3gm4h6292jakcru9pahh7lf3adma.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKrg7hsVuWdlWI_0sMhwdtw0Cn9o5rNMQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "583530748642-460a3gm4h6292jakcru9pahh7lf3adma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
