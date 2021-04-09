@@ -1,8 +1,10 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:wasla/screens/login/login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const String id = 'home';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,10 +16,8 @@ class HomeScreen extends StatelessWidget {
               color: Colors.green,
               child: Text("TEST"),
               onPressed: () {
-                print("YES");
-                DatabaseReference dbrf =
-                    FirebaseDatabase.instance.reference().child("testtt");
-                dbrf.set("Is yes");
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil(LoginScreen.id, (route) => false);
               })),
     );
   }
