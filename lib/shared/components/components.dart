@@ -65,3 +65,12 @@ Widget progressDialog(String status) => Dialog(
         ),
       ),
     );
+
+Widget myListTile({@required IconData iconData, @required String title}) =>
+    ListTile(
+      leading: Icon(iconData),
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 20),
+      ),
+    );
