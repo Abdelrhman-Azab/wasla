@@ -34,9 +34,7 @@ Widget myLoginButton({@required String text, @required Function function}) =>
       ),
     );
 
-final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-
-void showInSnackBar(String value) {
+void showInSnackBar(String value, GlobalKey<ScaffoldState> scaffoldKey) {
   scaffoldKey.currentState
       // ignore: deprecated_member_use
       .showSnackBar(new SnackBar(content: new Text(value)));

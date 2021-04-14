@@ -11,6 +11,7 @@ class LoginScreen extends StatelessWidget {
   static const String id = 'login';
   final emailcontroller = TextEditingController();
   final passwordcontroller = TextEditingController();
+  GlobalKey<ScaffoldState> loginScaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class LoginScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return Scaffold(
-          key: scaffoldKey,
+          key: loginScaffoldKey,
           body: SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -82,21 +83,25 @@ class LoginScreen extends StatelessWidget {
                             if (connectivityResult !=
                                     ConnectivityResult.mobile &&
                                 connectivityResult != ConnectivityResult.wifi) {
-                              showInSnackBar("Intenet is not connected");
+                              showInSnackBar(
+                                  "Intenet is not connected", loginScaffoldKey);
                               return;
                             }
                             if (!emailcontroller.text.contains("@")) {
                               showInSnackBar(
-                                  "Please enter a vaild email Address");
+                                  "Please enter a vaild email Address",
+                                  loginScaffoldKey);
                               return;
                             }
                             if (passwordcontroller.text.length < 8) {
-                              showInSnackBar("Please enter a vaild password");
+                              showInSnackBar("Please enter a vaild password",
+                                  loginScaffoldKey);
                               return;
                             }
                             LoginCubit.get(context).login(
                                 email: emailcontroller.text,
-                                password: passwordcontroller.text);
+                                password: passwordcontroller.text,
+                                scaffoldKey: loginScaffoldKey);
                           }),
                       TextButton(
                           style:

@@ -16,7 +16,8 @@ class RegisterCubit extends Cubit<RegisterStates> {
       {@required String email,
       @required String password,
       @required String phone,
-      @required String name}) async {
+      @required String name,
+      @required GlobalKey<ScaffoldState> scaffoldKey}) async {
     emit(RegisterStateLoading());
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -26,15 +27,16 @@ class RegisterCubit extends Cubit<RegisterStates> {
 
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
-        showInSnackBar('The password provided is too weak.');
+        showInSnackBar('The password provided is too weak.', scaffoldKey);
       } else if (e.code == 'email-already-in-use') {
         print('The account already exists for that email.');
-        showInSnackBar('The account already exists for that email.');
+        showInSnackBar(
+            'The account already exists for that email.', scaffoldKey);
       }
       return;
     } catch (e) {
       emit(RegisterStateFailed());
-      showInSnackBar(e);
+      showInSnackBar(e, scaffoldKey);
       print(e);
       return;
     }

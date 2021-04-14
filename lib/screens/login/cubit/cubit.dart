@@ -9,7 +9,10 @@ class LoginCubit extends Cubit<LoginStates> {
 
   static LoginCubit get(context) => BlocProvider.of(context);
 
-  login({@required String email, @required String password}) async {
+  login(
+      {@required String email,
+      @required String password,
+      @required GlobalKey<ScaffoldState> scaffoldKey}) async {
     emit(LoginStateLoading());
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -18,12 +21,12 @@ class LoginCubit extends Cubit<LoginStates> {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
         emit(LoginStateFailed());
-        showInSnackBar('No user found for that email.');
+        showInSnackBar('No user found for that email.', scaffoldKey);
         return;
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided for that user.');
         emit(LoginStateFailed());
-        showInSnackBar('Wrong password provided for that user.');
+        showInSnackBar('Wrong password provided for that user.', scaffoldKey);
         return;
       }
     }

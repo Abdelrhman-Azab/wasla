@@ -13,6 +13,9 @@ class SignUpScreen extends StatelessWidget {
   final emailController = TextEditingController();
   final passowrdController = TextEditingController();
   final phoneController = TextEditingController();
+  final GlobalKey<ScaffoldState> signUpScaffoldKey =
+      new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RegisterCubit, RegisterStates>(
@@ -33,95 +36,105 @@ class SignUpScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return Scaffold(
-          key: scaffoldKey,
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Image(
-                      width: 100,
-                      height: 100,
-                      alignment: Alignment.center,
-                      image: AssetImage("images/logo.png"),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      "Create a Rider's Account",
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    myTextFormField(
-                        hintText: "Full name",
-                        keyboardType: TextInputType.name,
-                        controller: fullNameController),
-                    myTextFormField(
-                        hintText: "Email address",
-                        keyboardType: TextInputType.emailAddress,
-                        controller: emailController),
-                    myTextFormField(
-                        hintText: "Phone number",
-                        keyboardType: TextInputType.phone,
-                        controller: phoneController),
-                    myTextFormField(
-                        hintText: "Password",
-                        keyboardType: TextInputType.visiblePassword,
-                        password: true,
-                        controller: passowrdController),
-                    myLoginButton(
-                        text: "REGISTER",
-                        function: () async {
-                          var connectivityResult =
-                              await (Connectivity().checkConnectivity());
-                          print(connectivityResult);
+          key: signUpScaffoldKey,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Image(
+                        width: 100,
+                        height: 100,
+                        alignment: Alignment.center,
+                        image: AssetImage("images/logo.png"),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Create a Rider's Account",
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      myTextFormField(
+                          hintText: "Full name",
+                          keyboardType: TextInputType.name,
+                          controller: fullNameController),
+                      myTextFormField(
+                          hintText: "Email address",
+                          keyboardType: TextInputType.emailAddress,
+                          controller: emailController),
+                      myTextFormField(
+                          hintText: "Phone number",
+                          keyboardType: TextInputType.phone,
+                          controller: phoneController),
+                      myTextFormField(
+                          hintText: "Password",
+                          keyboardType: TextInputType.visiblePassword,
+                          password: true,
+                          controller: passowrdController),
+                      myLoginButton(
+                          text: "REGISTER",
+                          function: () async {
+                            var connectivityResult =
+                                await (Connectivity().checkConnectivity());
+                            print(connectivityResult);
 
-                          if (connectivityResult != ConnectivityResult.mobile &&
-                              connectivityResult != ConnectivityResult.wifi) {
-                            showInSnackBar("Intenet is not connected");
-                            return;
-                          }
+                            if (connectivityResult !=
+                                    ConnectivityResult.mobile &&
+                                connectivityResult != ConnectivityResult.wifi) {
+                              showInSnackBar("Intenet is not connected",
+                                  signUpScaffoldKey);
+                              return;
+                            }
 
-                          if (fullNameController.text.length < 5) {
-                            showInSnackBar("Please enter a vaild full name");
-                            return;
-                          }
-                          if (!emailController.text.contains("@")) {
-                            showInSnackBar(
-                                "Please enter a vaild email Address");
-                            return;
-                          }
-                          if (phoneController.text.length < 10) {
-                            showInSnackBar("Please enter a vaild phone number");
-                            return;
-                          }
-                          if (passowrdController.text.length < 8) {
-                            showInSnackBar("Please enter a vaild password");
-                            return;
-                          }
+                            if (fullNameController.text.length < 5) {
+                              showInSnackBar("Please enter a vaild full name",
+                                  signUpScaffoldKey);
+                              return;
+                            }
+                            if (!emailController.text.contains("@")) {
+                              showInSnackBar(
+                                  "Please enter a vaild email Address",
+                                  signUpScaffoldKey);
+                              return;
+                            }
+                            if (phoneController.text.length < 10) {
+                              showInSnackBar(
+                                  "Please enter a vaild phone number",
+                                  signUpScaffoldKey);
+                              return;
+                            }
+                            if (passowrdController.text.length < 8) {
+                              showInSnackBar("Please enter a vaild password",
+                                  signUpScaffoldKey);
+                              return;
+                            }
 
-                          RegisterCubit.get(context).register(
-                            name: fullNameController.text,
-                            email: emailController.text,
-                            password: passowrdController.text,
-                            phone: phoneController.text,
-                          );
-                        }),
-                    TextButton(
-                        style: TextButton.styleFrom(primary: Colors.grey[900]),
-                        onPressed: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, LoginScreen.id, (route) => false);
-                        },
-                        child: Text("Already have a RIDER account ? Login"))
-                  ],
+                            RegisterCubit.get(context).register(
+                                name: fullNameController.text,
+                                email: emailController.text,
+                                password: passowrdController.text,
+                                phone: phoneController.text,
+                                scaffoldKey: signUpScaffoldKey);
+                          }),
+                      TextButton(
+                          style:
+                              TextButton.styleFrom(primary: Colors.grey[900]),
+                          onPressed: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, LoginScreen.id, (route) => false);
+                          },
+                          child: Text("Already have a RIDER account ? Login"))
+                    ],
+                  ),
                 ),
               ),
             ),
