@@ -9,6 +9,7 @@ import 'package:wasla/screens/login/login_screen.dart';
 import 'package:wasla/screens/registration/cubit/cubit.dart';
 import 'package:wasla/screens/registration/sign_up_screen.dart';
 import 'package:bloc/bloc.dart' as mainbloc;
+import 'package:wasla/screens/search/search_screen.dart';
 import 'shared/bloc_ovserver.dart';
 
 void main() async {
@@ -31,13 +32,13 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: ThemeData(
           fontFamily: "Bolt-Regular",
-          primarySwatch: Colors.blue,
         ),
         home: HomeScreen(),
         routes: {
           LoginScreen.id: (context) => LoginScreen(),
           SignUpScreen.id: (context) => SignUpScreen(),
-          HomeScreen.id: (context) => HomeScreen()
+          HomeScreen.id: (context) => HomeScreen(),
+          SearchScreen.id: (context) => SearchScreen(),
         },
       ),
     );

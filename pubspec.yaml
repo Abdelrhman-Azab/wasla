@@ -33,6 +33,8 @@ dependencies:
   bloc: ^7.0.0
   outline_material_icons: ^0.1.1
   platform: ^3.0.0
+  http: ^0.13.1
+
 
 
 

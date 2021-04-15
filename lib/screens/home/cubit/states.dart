@@ -5,3 +5,5 @@ class LocationStateInitial extends LocationStates {}
 class LocationStateSuccess extends LocationStates {}
 
 class LocationStateFailed extends LocationStates {}
+
+class LocationStateNetworkSuccess extends LocationStates {}
