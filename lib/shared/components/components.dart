@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:wasla/style/brand_colors.dart';
 
 Widget myTextFormField(
@@ -72,5 +73,43 @@ Widget myListTile({@required IconData iconData, @required String title}) =>
       title: Text(
         title,
         style: TextStyle(fontSize: 20),
+      ),
+    );
+
+Widget searchListContainer(
+        {@required String mainText, @required String secondaryText}) =>
+    TextButton(
+      style: TextButton.styleFrom(primary: Colors.black),
+      onPressed: () {
+        print(mainText);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        child: Row(
+          children: [
+            Icon(
+              OMIcons.locationOn,
+              color: Colors.grey[700],
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(mainText),
+                  Text(
+                    secondaryText,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(color: Colors.grey),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );

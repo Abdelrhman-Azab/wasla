@@ -14,8 +14,12 @@ class LocationCubit extends Cubit<LocationStates> {
   String readableAddress = "";
 
   void moveToCureentLocation(Completer<GoogleMapController> _controller) async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    print(permission);
+    Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.best);
+
     LatLng cameraPosition = LatLng(position.latitude, position.longitude);
 
     CameraPosition myPosition =
@@ -23,6 +27,7 @@ class LocationCubit extends Cubit<LocationStates> {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(myPosition));
     String address = await getNamedLocation(position);
+
     readableAddress = address;
     print(address);
   }

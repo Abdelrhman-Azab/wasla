@@ -9,6 +9,7 @@ import 'package:wasla/screens/login/login_screen.dart';
 import 'package:wasla/screens/registration/cubit/cubit.dart';
 import 'package:wasla/screens/registration/sign_up_screen.dart';
 import 'package:bloc/bloc.dart' as mainbloc;
+import 'package:wasla/screens/search/cubit/cubit.dart';
 import 'package:wasla/screens/search/search_screen.dart';
 import 'shared/bloc_ovserver.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (BuildContext context) => RegisterCubit()),
         BlocProvider(create: (BuildContext context) => LoginCubit()),
         BlocProvider(create: (BuildContext context) => LocationCubit()),
+        BlocProvider(create: (BuildContext context) => SearchCubit()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
