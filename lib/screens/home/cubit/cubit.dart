@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasla/screens/home/cubit/states.dart';
+import 'package:wasla/screens/search/cubit/cubit.dart';
 import 'package:wasla/shared/network/network.dart';
 
 class LocationCubit extends Cubit<LocationStates> {
@@ -12,14 +13,14 @@ class LocationCubit extends Cubit<LocationStates> {
 
   static LocationCubit get(context) => BlocProvider.of(context);
   String readableAddress = "";
-
+  Position currentPos;
   void moveToCureentLocation(Completer<GoogleMapController> _controller) async {
     LocationPermission permission = await Geolocator.checkPermission();
     print(permission);
     Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
-
+    currentPos = position;
     LatLng cameraPosition = LatLng(position.latitude, position.longitude);
 
     CameraPosition myPosition =
@@ -51,5 +52,9 @@ class LocationCubit extends Cubit<LocationStates> {
     }
     emit(LocationStateSuccess());
     return placeAddress;
+  }
+
+  refresh() {
+    emit(LocationStateBoundRefresh());
   }
 }

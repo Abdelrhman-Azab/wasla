@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:wasla/main.dart';
+import 'package:wasla/shared/network/network.dart';
 import 'package:wasla/style/brand_colors.dart';
 
 Widget myTextFormField(
@@ -77,12 +79,13 @@ Widget myListTile({@required IconData iconData, @required String title}) =>
     );
 
 Widget searchListContainer(
-        {@required String mainText, @required String secondaryText}) =>
+        {@required String mainText,
+        @required String secondaryText,
+        @required String placeid,
+        @required Function onPressed}) =>
     TextButton(
       style: TextButton.styleFrom(primary: Colors.black),
-      onPressed: () {
-        print(mainText);
-      },
+      onPressed: onPressed,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Row(
@@ -99,9 +102,9 @@ Widget searchListContainer(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(mainText),
+                  Text(mainText == null ? "new place" : mainText),
                   Text(
-                    secondaryText,
+                    secondaryText == null ? " " : secondaryText,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: TextStyle(color: Colors.grey),

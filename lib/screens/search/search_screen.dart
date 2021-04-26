@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasla/screens/home/cubit/cubit.dart';
 import 'package:wasla/screens/search/cubit/cubit.dart';
 import 'package:wasla/screens/search/cubit/states.dart';
@@ -15,7 +15,8 @@ class SearchScreen extends StatelessWidget {
     return BlocConsumer<SearchCubit, SearchStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var predictions = SearchCubit().get(context).predictions;
+        var cubit = SearchCubit().get(context);
+        var predictions = cubit.predictions;
 
         return Scaffold(
           body: SingleChildScrollView(
@@ -107,7 +108,7 @@ class SearchScreen extends StatelessWidget {
                                     if (value.length > 1) {
                                       SearchCubit()
                                           .get(context)
-                                          .seachPlace(value);
+                                          .searchPlace(value);
                                     }
                                   },
                                   autofocus: true,
@@ -131,8 +132,29 @@ class SearchScreen extends StatelessWidget {
                         padding: EdgeInsets.only(top: 20),
                         itemBuilder: (context, index) {
                           return searchListContainer(
-                              mainText: predictions[index].mainPlace,
-                              secondaryText: predictions[index].secondPlace);
+                            mainText: predictions[index].mainPlace,
+                            secondaryText: predictions[index].secondPlace,
+                            placeid: predictions[index].placeId,
+                            onPressed: () async {
+                              await cubit
+                                  .getDetails(predictions[index].placeId);
+
+                              await cubit.getDirections(
+                                LatLng(
+                                    LocationCubit.get(context)
+                                        .currentPos
+                                        .latitude,
+                                    LocationCubit.get(context)
+                                        .currentPos
+                                        .longitude),
+                                LatLng(cubit.newAddress.latitude,
+                                    cubit.newAddress.longitude),
+                              );
+                              Navigator.pop(context);
+
+                              LocationCubit.get(context).refresh();
+                            },
+                          );
                         },
                         separatorBuilder: (context, index) {
                           return Divider();

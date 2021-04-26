@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:wasla/screens/home/cubit/cubit.dart';
 import 'package:wasla/screens/home/cubit/states.dart';
+import 'package:wasla/screens/search/cubit/cubit.dart';
 import 'package:wasla/screens/search/search_screen.dart';
 import 'package:wasla/shared/components/components.dart';
 import 'package:wasla/style/brand_colors.dart';
@@ -19,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController mycontroller;
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -29,8 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var poly = SearchCubit().get(context).polylines;
+    print("second poly length ${poly.length}");
+
     return BlocConsumer<LocationCubit, LocationStates>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is LocationStateBoundRefresh) {}
+      },
       builder: (context, state) {
         return Scaffold(
           drawer: Container(
@@ -93,11 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
               myLocationButtonEnabled: true,
               myLocationEnabled: true,
               mapType: MapType.normal,
+              polylines: poly,
               initialCameraPosition: _kGooglePlex,
               onMapCreated: (GoogleMapController controller) {
+                mycontroller = controller;
                 _controller.complete(controller);
+
                 LocationCubit.get(context).moveToCureentLocation(_controller);
-                setState(() {});
               },
             ),
             //Menu Button
