@@ -9,3 +9,7 @@ class LocationStateBoundRefresh extends LocationStates {}
 class LocationStateFailed extends LocationStates {}
 
 class LocationStateNetworkSuccess extends LocationStates {}
+
+class LocationStateClearData extends LocationStates {}
+
+class LocationStateRequestaRide extends LocationStates {}

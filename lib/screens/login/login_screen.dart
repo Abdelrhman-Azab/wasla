@@ -72,7 +72,7 @@ class LoginScreen extends StatelessWidget {
                           keyboardType: TextInputType.visiblePassword,
                           controller: passwordcontroller,
                           password: true),
-                      myLoginButton(
+                      myElevatedButton(
                           text: "LOGIN",
                           function: () async {
                             print("logggg");

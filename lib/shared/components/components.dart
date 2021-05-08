@@ -19,13 +19,16 @@ Widget myTextFormField(
       ),
     );
 
-Widget myLoginButton({@required String text, @required Function function}) =>
+Widget myElevatedButton(
+        {@required String text,
+        @required Function function,
+        Color color = BrandColors.colorGreen}) =>
     Container(
-      height: 85,
+      height: 90,
       padding: EdgeInsets.all(20),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-            primary: BrandColors.colorGreen,
+            primary: color,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20))),
         onPressed: function,

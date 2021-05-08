@@ -80,7 +80,7 @@ class SignUpScreen extends StatelessWidget {
                           keyboardType: TextInputType.visiblePassword,
                           password: true,
                           controller: passowrdController),
-                      myLoginButton(
+                      myElevatedButton(
                           text: "REGISTER",
                           function: () async {
                             var connectivityResult =

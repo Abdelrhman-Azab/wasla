@@ -11,7 +11,7 @@ import 'package:wasla/shared/network/network.dart';
 class SearchCubit extends Cubit<SearchStates> {
   SearchCubit() : super(SearchStateInitial());
 
-  SearchCubit get(context) => BlocProvider.of(context);
+  static SearchCubit get(context) => BlocProvider.of(context);
 
   // predictions that shown on search
   List<Predictions> predictions = [];
@@ -28,7 +28,13 @@ class SearchCubit extends Cubit<SearchStates> {
 
   final Set<Polyline> polylines = {};
 
+  String destinationName = "";
+
+  String OriginName = "";
+
   LatLngBounds bounds;
+
+  int totalMoney = 0;
 
   searchPlace(String placeName) async {
     Uri url = Uri.parse(
@@ -114,6 +120,21 @@ class SearchCubit extends Cubit<SearchStates> {
       polylines.add(polyline);
       getBounds(origin, destination);
 
+      Marker destinationMarker = Marker(
+          markerId: MarkerId("Destination"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          position: destination,
+          infoWindow:
+              InfoWindow(title: destinationName, snippet: "destination"));
+      Marker originMarker = Marker(
+          markerId: MarkerId("Origin"),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          position: origin,
+          infoWindow: InfoWindow(title: OriginName, snippet: "My location"));
+      markers.add(originMarker);
+      markers.add(destinationMarker);
+      totalMoney = calculateMoney();
       emit(SearchGetDirectionStateSuccess());
     }
   }
@@ -133,5 +154,23 @@ class SearchCubit extends Cubit<SearchStates> {
     } else {
       bounds = LatLngBounds(southwest: origin, northeast: destination);
     }
+  }
+
+  changeDestName(String name) {
+    destinationName = name;
+  }
+
+  changeOriginName(String name) {
+    OriginName = name;
+  }
+
+  int calculateMoney() {
+    //base tax = 3$
+    //tax per kilo = 0.3$
+    //tax per min = 0.2%
+    double taxPerKilo = (direction.distanceValue / 1000) * 0.3;
+    double taxPerMin = (direction.durationValue / 60) * 0.2;
+    int totalTaxes = (taxPerKilo + taxPerMin + 3).round();
+    return totalTaxes;
   }
 }

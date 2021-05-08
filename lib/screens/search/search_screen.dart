@@ -15,8 +15,9 @@ class SearchScreen extends StatelessWidget {
     return BlocConsumer<SearchCubit, SearchStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var cubit = SearchCubit().get(context);
+        var cubit = SearchCubit.get(context);
         var predictions = cubit.predictions;
+        String locationName = LocationCubit.get(context).readableAddress;
 
         return Scaffold(
           body: SingleChildScrollView(
@@ -76,8 +77,7 @@ class SearchScreen extends StatelessWidget {
                               child: Container(
                                 child: TextField(
                                   controller: pickUpController
-                                    ..text = LocationCubit.get(context)
-                                        .readableAddress,
+                                    ..text = locationName,
                                   decoration: InputDecoration(
                                       fillColor: Colors.grey[200],
                                       filled: true,
@@ -106,8 +106,7 @@ class SearchScreen extends StatelessWidget {
                                 child: TextField(
                                   onChanged: (value) {
                                     if (value.length > 1) {
-                                      SearchCubit()
-                                          .get(context)
+                                      SearchCubit.get(context)
                                           .searchPlace(value);
                                     }
                                   },
@@ -136,6 +135,10 @@ class SearchScreen extends StatelessWidget {
                             secondaryText: predictions[index].secondPlace,
                             placeid: predictions[index].placeId,
                             onPressed: () async {
+                              SearchCubit.get(context)
+                                  .changeDestName(predictions[index].mainPlace);
+                              SearchCubit.get(context)
+                                  .changeOriginName(locationName);
                               await cubit
                                   .getDetails(predictions[index].placeId);
 
@@ -150,8 +153,10 @@ class SearchScreen extends StatelessWidget {
                                 LatLng(cubit.newAddress.latitude,
                                     cubit.newAddress.longitude),
                               );
+                              LocationCubit.get(context)
+                                  .showRequestCarContainer();
                               Navigator.pop(context);
-
+                              LocationCubit.get(context).isBackButton = true;
                               LocationCubit.get(context).refresh();
                             },
                           );

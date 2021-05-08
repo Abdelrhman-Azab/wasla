@@ -9,17 +9,14 @@ import 'package:wasla/screens/home/cubit/states.dart';
 import 'package:wasla/screens/search/cubit/cubit.dart';
 import 'package:wasla/screens/search/search_screen.dart';
 import 'package:wasla/shared/components/components.dart';
+import 'package:wasla/shared/network/network.dart';
 import 'package:wasla/style/brand_colors.dart';
-import 'dart:io' show Platform;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   static const String id = 'home';
 
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mycontroller;
 
@@ -29,18 +26,35 @@ class _HomeScreenState extends State<HomeScreen> {
   );
 
   CameraPosition currentPosition;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    var poly = SearchCubit().get(context).polylines;
-    print("second poly length ${poly.length}");
+    var _locationCubit = LocationCubit.get(context);
+    var poly = SearchCubit.get(context).polylines;
+    var googleMarkers = SearchCubit.get(context).markers;
 
     return BlocConsumer<LocationCubit, LocationStates>(
       listener: (context, state) {
-        if (state is LocationStateBoundRefresh) {}
+        if (state is LocationStateInitial) {
+          getUserInfo();
+        }
+
+        if (state is LocationStateBoundRefresh) {
+          LatLngBounds lngBounds = SearchCubit.get(context).bounds;
+          mycontroller
+              .animateCamera(CameraUpdate.newLatLngBounds(lngBounds, 80));
+        }
+
+        if (state is LocationStateClearData) {
+          _locationCubit.moveToCureentLocation(_controller);
+        }
       },
       builder: (context, state) {
+        int totalTaxes = SearchCubit.get(context).totalMoney;
+
         return Scaffold(
+          key: _scaffoldKey,
           drawer: Container(
             width: 250,
             color: Colors.white,
@@ -91,167 +105,345 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          body: Stack(children: [
-            //Google Maps
+          body: SafeArea(
+            child: Stack(children: [
+              //Google Maps
 
-            GoogleMap(
-              padding: EdgeInsets.only(bottom: Platform.isAndroid ? 300 : 270),
-              zoomControlsEnabled: true,
-              zoomGesturesEnabled: true,
-              myLocationButtonEnabled: true,
-              myLocationEnabled: true,
-              mapType: MapType.normal,
-              polylines: poly,
-              initialCameraPosition: _kGooglePlex,
-              onMapCreated: (GoogleMapController controller) {
-                mycontroller = controller;
-                _controller.complete(controller);
+              GoogleMap(
+                padding: EdgeInsets.only(bottom: _locationCubit.mapPadding),
+                zoomControlsEnabled: true,
+                zoomGesturesEnabled: true,
+                myLocationButtonEnabled: true,
+                myLocationEnabled: true,
+                mapType: MapType.normal,
+                polylines: poly,
+                markers: googleMarkers,
+                initialCameraPosition: _kGooglePlex,
+                onMapCreated: (GoogleMapController controller) {
+                  mycontroller = controller;
+                  _controller.complete(controller);
 
-                LocationCubit.get(context).moveToCureentLocation(_controller);
-              },
-            ),
-            //Menu Button
+                  _locationCubit.moveToCureentLocation(_controller);
+                },
+              ),
+              //Menu Button
 
-            //Search bar
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                  width: double.infinity,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+              //Search bar
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                    width: double.infinity,
+                    height: _locationCubit.searchBarHeight,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          "Nice to see you!",
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                        SizedBox(
-                          height: 2,
-                        ),
-                        Text(
-                          "Where are you going?",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, SearchScreen.id);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(color: Colors.grey[100]),
-                            height: 50,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            "Nice to see you!",
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                          SizedBox(
+                            height: 2,
+                          ),
+                          Text(
+                            "Where are you going?",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, SearchScreen.id);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration:
+                                  BoxDecoration(color: Colors.grey[100]),
+                              height: 50,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.search,
+                                    color: Colors.blueAccent,
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Text(
+                                    "Search destination",
+                                    style: TextStyle(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            color: Colors.white,
+                            height: 60,
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.search,
-                                  color: Colors.blueAccent,
+                                  OMIcons.home,
+                                  color: BrandColors.colorDimText,
                                 ),
                                 SizedBox(
-                                  width: 15,
+                                  width: 10,
                                 ),
-                                Text(
-                                  "Search destination",
-                                  style: TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Home",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      "Sadat city, monofia,egypt",
+                                      style: TextStyle(color: Colors.grey),
+                                    )
+                                  ],
                                 )
                               ],
                             ),
                           ),
-                        ),
-                        Container(
-                          color: Colors.white,
-                          height: 60,
-                          child: Row(
-                            children: [
-                              Icon(
-                                OMIcons.home,
-                                color: BrandColors.colorDimText,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Home",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "Sadat city, monofia,egypt",
-                                    style: TextStyle(color: Colors.grey),
-                                  )
-                                ],
-                              )
-                            ],
+                          Divider(),
+                          Container(
+                            color: Colors.white,
+                            height: 60,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  OMIcons.workOutline,
+                                  color: BrandColors.colorDimText,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Work",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      "Sadat city, monofia,egypt",
+                                      style: TextStyle(color: Colors.grey),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        Divider(),
-                        Container(
-                          color: Colors.white,
-                          height: 60,
-                          child: Row(
-                            children: [
-                              Icon(
-                                OMIcons.workOutline,
-                                color: BrandColors.colorDimText,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Work",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "Sadat city, monofia,egypt",
-                                    style: TextStyle(color: Colors.grey),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
+                        ],
+                      ),
+                    )),
+              ),
+
+              //Request a ride
+              Positioned(
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: Container(
+                  height: _locationCubit.requestBarHeight,
+                  padding: EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 15,
+                            spreadRadius: 0.5,
+                            offset: Offset(0.7, 0.7))
                       ],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      )),
+                  child: _locationCubit.isRequested
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            DefaultTextStyle(
+                              style: const TextStyle(
+                                fontSize: 20.0,
+                              ),
+                              child: AnimatedTextKit(
+                                animatedTexts: [
+                                  WavyAnimatedText(
+                                    'Requesting a Ride...',
+                                    textStyle: TextStyle(
+                                        color: Colors.black, fontSize: 26),
+                                  ),
+                                ],
+                                isRepeatingAnimation: true,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 40,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                _locationCubit.requestaRide();
+                              },
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: Border.all(
+                                        width: 1, color: Colors.grey)),
+                                child: Icon(Icons.close, size: 25),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text("Cancel ride")
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              height: 70,
+                              padding: EdgeInsets.all(10),
+                              width: double.infinity,
+                              color: Colors.green[50],
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    "images/taxi.png",
+                                    height: 70,
+                                    width: 70,
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Text(
+                                    "Taxi",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    "$totalTaxes\$",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.moneyBillAlt,
+                                    color: Colors.grey[600],
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text("Cash"),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: Colors.grey[600],
+                                    size: 14,
+                                  ),
+                                  SizedBox(
+                                    height: 30,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            myElevatedButton(
+                              text: "REQUEST CAR",
+                              function: () {
+                                _locationCubit.requestaRide();
+                                print(_locationCubit.isRequested);
+                              },
+                              color: Colors.green[800],
+                            )
+                          ],
+                        ),
+                ),
+              ),
+              Positioned(
+                  top: 10,
+                  left: 20,
+                  child: GestureDetector(
+                    onTap: () {
+                      _locationCubit.isBackButton
+                          ? _locationCubit.backButtonFunction(context)
+                          : _scaffoldKey.currentState.openDrawer();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(0.7, 0.7),
+                                blurRadius: 5,
+                                spreadRadius: 0.5)
+                          ]),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          _locationCubit.isBackButton
+                              ? Icons.arrow_back
+                              : Icons.menu,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
-                  )),
-            )
-          ]),
+                  ))
+            ]),
+          ),
         );
       },
     );

@@ -31,11 +31,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (BuildContext context) => SearchCubit()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
           fontFamily: "Bolt-Regular",
         ),
-        home: HomeScreen(),
+        home: LoginScreen(),
         routes: {
           LoginScreen.id: (context) => LoginScreen(),
           SignUpScreen.id: (context) => SignUpScreen(),
