@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasla/screens/home/cubit/states.dart';
 import 'package:wasla/screens/search/cubit/cubit.dart';
+import 'package:wasla/shared/components/globalVariables.dart';
 import 'package:wasla/shared/network/network.dart';
 
 class LocationCubit extends Cubit<LocationStates> {
@@ -14,7 +15,8 @@ class LocationCubit extends Cubit<LocationStates> {
 
   static LocationCubit get(context) => BlocProvider.of(context);
 
-  String readableAddress = "";
+  String currentLocationAddress = "";
+  String destinationAddress = "";
   Position currentPos;
   GoogleMapController mainController;
   double mapPadding = 310;
@@ -39,8 +41,7 @@ class LocationCubit extends Cubit<LocationStates> {
     mainController = controller;
     String address = await getNamedLocation(position);
 
-    readableAddress = address;
-    print(address);
+    currentLocationAddress = address;
   }
 
   Future<String> getNamedLocation(Position position) async {
@@ -88,8 +89,38 @@ class LocationCubit extends Cubit<LocationStates> {
     emit(LocationStateClearData());
   }
 
-  requestaRide() {
+  requestaRide(BuildContext context) {
     isRequested = !isRequested;
+
+    Map currentAddressMap = {
+      "latitude": currentPos.latitude,
+      "longitude": currentPos.latitude
+    };
+
+    Map destinationAddressMap = {
+      "latitude": SearchCubit.get(context).newAddress.latitude,
+      "longitude": SearchCubit.get(context).newAddress.longitude,
+    };
+
+    Map rideRequestMap = {
+      "created_at": DateTime.now().toString(),
+      "rider_name": appUser.name,
+      "rider_phone": appUser.phone,
+      "current_address": currentLocationAddress,
+      "destination_address": SearchCubit.get(context).destinationName,
+      "current_map": currentAddressMap,
+      "destination_map": destinationAddressMap,
+      "payment_method": "card",
+      "driver_id": "waiting",
+    };
+    rideref.set(rideRequestMap);
     emit(LocationStateRequestaRide());
+  }
+
+  cancelRideRequest(BuildContext context) {
+    isRequested = !isRequested;
+    rideref.remove();
+    backButtonFunction(context);
+    emit(LocationStateCancelaRide());
   }
 }

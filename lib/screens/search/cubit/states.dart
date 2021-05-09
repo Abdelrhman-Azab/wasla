@@ -4,6 +4,8 @@ class SearchStateInitial extends SearchStates {}
 
 class SearchStateFailed extends SearchStates {}
 
+class SearchStateLoading extends SearchStates {}
+
 class SearchStateSuccess extends SearchStates {}
 
 class SearchDetailsStateFailed extends SearchStates {}

@@ -17,114 +17,122 @@ class SearchScreen extends StatelessWidget {
       builder: (context, state) {
         var cubit = SearchCubit.get(context);
         var predictions = cubit.predictions;
-        String locationName = LocationCubit.get(context).readableAddress;
+        String locationName = LocationCubit.get(context).currentLocationAddress;
 
         return Scaffold(
           body: SingleChildScrollView(
             child: Column(
               children: [
-                Container(
-                  height: 230,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        spreadRadius: 0.5,
-                        blurRadius: 5.0,
-                        offset: Offset(0.7, 0.7),
+                cubit.searchIsLoading
+                    ? Container(
+                        height: 230,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : Container(
+                        height: 230,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              spreadRadius: 0.5,
+                              blurRadius: 5.0,
+                              offset: Offset(0.7, 0.7),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 24, bottom: 20, right: 24, top: 48),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Stack(
+                                children: [
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Icon(Icons.arrow_back)),
+                                  Center(
+                                    child: Text(
+                                      "Set Destination",
+                                      style: TextStyle(
+                                          fontFamily: "Bolt-Semibold",
+                                          fontSize: 20),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                children: [
+                                  Image.asset(
+                                    "images/pickicon.png",
+                                    height: 16,
+                                    width: 16,
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      child: TextField(
+                                        controller: pickUpController
+                                          ..text = locationName,
+                                        decoration: InputDecoration(
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                            border: InputBorder.none,
+                                            hintText: "Pickup Location"),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  Image.asset(
+                                    "images/desticon.png",
+                                    height: 16,
+                                    width: 16,
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      child: TextField(
+                                        onChanged: (value) {
+                                          if (value.length > 1) {
+                                            SearchCubit.get(context)
+                                                .searchPlace(value);
+                                          }
+                                        },
+                                        autofocus: true,
+                                        decoration: InputDecoration(
+                                            fillColor: Colors.grey[200],
+                                            filled: true,
+                                            border: InputBorder.none,
+                                            hintText: "Where to?"),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 24, bottom: 20, right: 24, top: 48),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Stack(
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Icon(Icons.arrow_back)),
-                            Center(
-                              child: Text(
-                                "Set Destination",
-                                style: TextStyle(
-                                    fontFamily: "Bolt-Semibold", fontSize: 20),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          children: [
-                            Image.asset(
-                              "images/pickicon.png",
-                              height: 16,
-                              width: 16,
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: TextField(
-                                  controller: pickUpController
-                                    ..text = locationName,
-                                  decoration: InputDecoration(
-                                      fillColor: Colors.grey[200],
-                                      filled: true,
-                                      border: InputBorder.none,
-                                      hintText: "Pickup Location"),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Image.asset(
-                              "images/desticon.png",
-                              height: 16,
-                              width: 16,
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: TextField(
-                                  onChanged: (value) {
-                                    if (value.length > 1) {
-                                      SearchCubit.get(context)
-                                          .searchPlace(value);
-                                    }
-                                  },
-                                  autofocus: true,
-                                  decoration: InputDecoration(
-                                      fillColor: Colors.grey[200],
-                                      filled: true,
-                                      border: InputBorder.none,
-                                      hintText: "Where to?"),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 Container(
                     height: 500,
                     child: ListView.separated(
@@ -135,10 +143,10 @@ class SearchScreen extends StatelessWidget {
                             secondaryText: predictions[index].secondPlace,
                             placeid: predictions[index].placeId,
                             onPressed: () async {
-                              SearchCubit.get(context)
+                              cubit.searchLoadChange();
+                              cubit
                                   .changeDestName(predictions[index].mainPlace);
-                              SearchCubit.get(context)
-                                  .changeOriginName(locationName);
+                              cubit.changeOriginName(locationName);
                               await cubit
                                   .getDetails(predictions[index].placeId);
 
@@ -153,6 +161,7 @@ class SearchScreen extends StatelessWidget {
                                 LatLng(cubit.newAddress.latitude,
                                     cubit.newAddress.longitude),
                               );
+                              cubit.searchLoadChange();
                               LocationCubit.get(context)
                                   .showRequestCarContainer();
                               Navigator.pop(context);

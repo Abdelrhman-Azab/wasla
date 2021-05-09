@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -9,6 +11,7 @@ import 'package:wasla/screens/home/cubit/states.dart';
 import 'package:wasla/screens/search/cubit/cubit.dart';
 import 'package:wasla/screens/search/search_screen.dart';
 import 'package:wasla/shared/components/components.dart';
+import 'package:wasla/shared/components/globalVariables.dart';
 import 'package:wasla/shared/network/network.dart';
 import 'package:wasla/style/brand_colors.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -36,10 +39,6 @@ class HomeScreen extends StatelessWidget {
 
     return BlocConsumer<LocationCubit, LocationStates>(
       listener: (context, state) {
-        if (state is LocationStateInitial) {
-          getUserInfo();
-        }
-
         if (state is LocationStateBoundRefresh) {
           LatLngBounds lngBounds = SearchCubit.get(context).bounds;
           mycontroller
@@ -52,6 +51,7 @@ class HomeScreen extends StatelessWidget {
       },
       builder: (context, state) {
         int totalTaxes = SearchCubit.get(context).totalMoney;
+        getUserInfo();
 
         return Scaffold(
           key: _scaffoldKey,
@@ -314,7 +314,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             GestureDetector(
                               onTap: () {
-                                _locationCubit.requestaRide();
+                                _locationCubit.cancelRideRequest(context);
                               },
                               child: Container(
                                 width: 50,
@@ -402,7 +402,7 @@ class HomeScreen extends StatelessWidget {
                             myElevatedButton(
                               text: "REQUEST CAR",
                               function: () {
-                                _locationCubit.requestaRide();
+                                _locationCubit.requestaRide(context);
                                 print(_locationCubit.isRequested);
                               },
                               color: Colors.green[800],
@@ -411,6 +411,8 @@ class HomeScreen extends StatelessWidget {
                         ),
                 ),
               ),
+
+              // Menu and Back button
               Positioned(
                   top: 10,
                   left: 20,

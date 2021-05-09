@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasla/models/Appuser.dart';
 import 'package:wasla/models/address.dart';
 import 'package:wasla/models/direction.dart';
 import 'package:wasla/models/predictions.dart';
@@ -17,6 +18,7 @@ class SearchCubit extends Cubit<SearchStates> {
   List<Predictions> predictions = [];
 
   // address of the new place
+
   Address newAddress = new Address();
 
   // direction from origin to new place
@@ -35,6 +37,8 @@ class SearchCubit extends Cubit<SearchStates> {
   LatLngBounds bounds;
 
   int totalMoney = 0;
+
+  bool searchIsLoading = false;
 
   searchPlace(String placeName) async {
     Uri url = Uri.parse(
@@ -76,6 +80,7 @@ class SearchCubit extends Cubit<SearchStates> {
   }
 
   getDirections(LatLng origin, LatLng destination) async {
+    emit(SearchStateLoading());
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=driving&key=AIzaSyCORdT7v6fwbupqmdkSg_-q6nc7m9FVESw";
     var result = await getRequest(Uri.parse(url));
@@ -162,6 +167,10 @@ class SearchCubit extends Cubit<SearchStates> {
 
   changeOriginName(String name) {
     OriginName = name;
+  }
+
+  searchLoadChange() {
+    searchIsLoading = !searchIsLoading;
   }
 
   int calculateMoney() {

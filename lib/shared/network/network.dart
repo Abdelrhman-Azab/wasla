@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
-
-FirebaseAuth auth = FirebaseAuth.instance;
+import 'package:wasla/models/Appuser.dart';
+import 'package:wasla/shared/components/globalVariables.dart';
 
 Future<dynamic> getRequest(Uri url) async {
   http.Response response = await http.get(url);
@@ -23,6 +23,14 @@ Future<dynamic> getRequest(Uri url) async {
 }
 
 getUserInfo() {
-  User user = auth.currentUser;
-  print(user.email);
+  auth = FirebaseAuth.instance;
+  user = auth.currentUser;
+  FirebaseDatabase.instance
+      .reference()
+      .child("users/${user.uid}")
+      .once()
+      .then((DataSnapshot dataSnapshot) {
+    appUser = AppUser.fromSnapshot(dataSnapshot);
+    print(appUser.email);
+  });
 }

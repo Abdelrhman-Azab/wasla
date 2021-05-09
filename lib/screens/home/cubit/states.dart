@@ -13,3 +13,5 @@ class LocationStateNetworkSuccess extends LocationStates {}
 class LocationStateClearData extends LocationStates {}
 
 class LocationStateRequestaRide extends LocationStates {}
+
+class LocationStateCancelaRide extends LocationStates {}
