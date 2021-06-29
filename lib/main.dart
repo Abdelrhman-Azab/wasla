@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           fontFamily: "Bolt-Regular",
         ),
-        home: HomeScreen(),
+        home: LoginScreen(),
         routes: {
           LoginScreen.id: (context) => LoginScreen(),
           SignUpScreen.id: (context) => SignUpScreen(),
